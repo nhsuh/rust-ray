@@ -2,6 +2,7 @@ pub mod vec3 {
     use std::ops::{
         Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
     };
+    #[derive(Copy, Clone)]
     pub struct Vec3 {
         array: [f64; 3],
     }
@@ -33,6 +34,9 @@ pub mod vec3 {
         #[inline(always)]
         pub fn print_vec(&self) {
             println!("{} {} {}", self.x(), self.y(), self.z())
+        }
+        pub fn eprint_vec(&self) {
+            eprintln!("{} {} {}", self.x(), self.y(), self.z())
         }
         #[inline(always)]
         pub fn dot(u: &Vec3, v: &Vec3) -> f64 {
@@ -125,10 +129,36 @@ pub mod vec3 {
             }
         }
     }
+    impl Add for Vec3 {
+        type Output = Vec3;
+        #[inline(always)]
+        fn add(self, rhs: Vec3) -> Vec3 {
+            Vec3 {
+                array: [
+                    self.array[0] + rhs.array[0],
+                    self.array[1] + rhs.array[1],
+                    self.array[2] + rhs.array[2],
+                ],
+            }
+        }
+    }
     impl Sub for &Vec3 {
         type Output = Vec3;
         #[inline(always)]
         fn sub(self, rhs: &Vec3) -> Vec3 {
+            Vec3 {
+                array: [
+                    self.array[0] - rhs.array[0],
+                    self.array[1] - rhs.array[1],
+                    self.array[2] - rhs.array[2],
+                ],
+            }
+        }
+    }
+    impl Sub for Vec3 {
+        type Output = Vec3;
+        #[inline(always)]
+        fn sub(self, rhs: Vec3) -> Vec3 {
             Vec3 {
                 array: [
                     self.array[0] - rhs.array[0],
@@ -151,7 +181,33 @@ pub mod vec3 {
             }
         }
     }
+    impl Mul for Vec3 {
+        type Output = Vec3;
+        #[inline(always)]
+        fn mul(self, rhs: Vec3) -> Vec3 {
+            Vec3 {
+                array: [
+                    self.array[0] * rhs.array[0],
+                    self.array[1] * rhs.array[1],
+                    self.array[2] * rhs.array[2],
+                ],
+            }
+        }
+    }
     impl Mul<f64> for &Vec3 {
+        type Output = Vec3;
+        #[inline(always)]
+        fn mul(self, rhs: f64) -> Vec3 {
+            Vec3 {
+                array: [
+                    self.array[0] * rhs,
+                    self.array[1] * rhs,
+                    self.array[2] * rhs,
+                ],
+            }
+        }
+    }
+    impl Mul<f64> for Vec3 {
         type Output = Vec3;
         #[inline(always)]
         fn mul(self, rhs: f64) -> Vec3 {
@@ -171,5 +227,12 @@ pub mod vec3 {
             self * (1.0 / rhs)
         }
     }
-    type Point3 = Vec3;
+    impl Div<f64> for Vec3 {
+        type Output = Vec3;
+        #[inline(always)]
+        fn div(self, rhs: f64) -> Vec3 {
+            self * (1.0 / rhs)
+        }
+    }
+    pub type Point3 = Vec3;
 }

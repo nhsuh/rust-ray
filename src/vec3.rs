@@ -1,7 +1,9 @@
 pub mod vec3 {
+    use crate::rtweekend::rtweekend::*;
     use std::ops::{
         Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
     };
+    use std::cmp;
     #[derive(Copy, Clone)]
     pub struct Vec3 {
         array: [f64; 3],
@@ -15,6 +17,20 @@ pub mod vec3 {
 
         pub fn new_params(x: f64, y: f64, z: f64) -> Vec3 {
             Vec3 { array: [x, y, z] }
+        }
+        pub fn random() -> Vec3 {
+            Vec3 {
+                array: [random_float(), random_float(), random_float()],
+            }
+        }
+        pub fn random_range(min: f64, max: f64) -> Vec3 {
+            Vec3 {
+                array: [
+                    random_float_range(min, max),
+                    random_float_range(min, max),
+                    random_float_range(min, max),
+                ],
+            }
         }
         pub fn x(&self) -> f64 {
             self.array[0]
@@ -30,6 +46,10 @@ pub mod vec3 {
         }
         pub fn length(&self) -> f64 {
             self.length_squared().sqrt()
+        }
+        pub fn near_zero(&self) -> bool {
+            const S: f64 = 1e-8;
+            return (self.x().abs() < S) && (self.y().abs() < S) && (self.z().abs() < S)
         }
         #[inline(always)]
         pub fn print_vec(&self) {
@@ -55,6 +75,39 @@ pub mod vec3 {
         #[inline(always)]
         pub fn unit_vector(&self) -> Vec3 {
             return self / self.length();
+        }
+        #[inline(always)]
+        fn random_in_unit_sphere() -> Vec3 {
+            loop {
+                let p = Vec3::random_range(-1.0, 1.0);
+                if p.length_squared() < 1.0 {
+                    return p;
+                }
+            }
+        }
+        #[inline(always)]
+        pub fn random_unit_vector() -> Vec3 {
+            Vec3::random_in_unit_sphere().unit_vector()
+        }
+        #[inline(always)]
+        pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+            let on_unit_sphere: Vec3 = Vec3::random_unit_vector();
+            if Vec3::dot(&on_unit_sphere, normal) > 0.0 {
+                return on_unit_sphere;
+            }
+            -on_unit_sphere
+        }
+
+        pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+            v -  &(n * 2.0 * Vec3::dot(v, n))
+        }
+        pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+            let cos_theta = (1.0_f64).min(Vec3::dot(&-(*uv), n));
+            let r_out_perp = (uv + &(n * cos_theta)) * etai_over_etat;
+            let r_out_parallel = -(*n) * (1.0 - r_out_perp.length_squared()).abs().sqrt();
+            r_out_perp + r_out_parallel
+
+
         }
     }
     impl Neg for Vec3 {

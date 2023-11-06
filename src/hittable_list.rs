@@ -30,10 +30,14 @@ pub mod hittable_list {
             let mut closest_so_far = ray_t.max;
 
             for object in &self.objects {
-                if object.hit(r, Interval::new_params(ray_t.min, closest_so_far), &mut temp_rec) {
+                if object.hit(
+                    r,
+                    Interval::new_params(ray_t.min, closest_so_far),
+                    &mut temp_rec,
+                ) {
                     hit_anything = true;
                     closest_so_far = temp_rec.t;
-                    *rec = temp_rec;
+                    *rec = temp_rec.clone();
                 }
             }
             hit_anything

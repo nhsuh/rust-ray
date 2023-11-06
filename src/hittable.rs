@@ -1,11 +1,14 @@
 pub mod hittable {
+    use crate::color::color::Color;
+    use crate::interval::interval::Interval;
+    use crate::material::material::{Lambertian, Material};
     pub use crate::ray::ray::Ray;
     pub use crate::vec3::vec3::{Point3, Vec3};
-    use crate::interval::interval::Interval;
-    #[derive(Copy, Clone)]
+    #[derive(Clone)]
     pub struct HitRecord {
         pub p: Point3,
         pub normal: Vec3,
+        pub mat: Box<dyn Material>,
         pub t: f64,
         pub front_face: bool,
     }
@@ -15,6 +18,9 @@ pub mod hittable {
             HitRecord {
                 p: Point3::new(),
                 normal: Vec3::new(),
+                mat: Box::new(Lambertian {
+                    albedo: Color::new(),
+                }),
                 t: 0.0,
                 front_face: false,
             }
